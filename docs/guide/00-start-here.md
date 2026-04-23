@@ -6,10 +6,12 @@ last-reviewed: 2026-04-23
 
 # Start here
 
-Welcome. This is a **technology brief**, not a tutorial.
+You have been using AI for coding all semester. One chat, one file, one session, mostly homework-sized problems. **This project is different: multi-session, multi-file, multi-week.** The habits that worked on a one-shot assignment break at this scale — the AI forgets, invents APIs, contradicts yesterday's decisions, and confidently ships code that doesn't run.
+
+This guide is about the habits that don't break.
 
 > **The brief:** ship a scrollytelling personal web page, deployed to GitHub Pages, built from this template.
-> **The real lesson:** how to work with an AI coding assistant on a real project — with references, specs, phases, tests, and audits — without losing control of what it writes.
+> **The real lesson:** how to direct an AI coding assistant on a real project — with references, specs, phases, tests, and audits — without losing control of what it writes.
 
 The Next.js stack is the *vehicle*. The process is the *payload*. Frameworks will change; how you direct an AI pair on a codebase larger than a chat window will not. Do the brief honestly and the process will stick.
 
@@ -59,5 +61,7 @@ A personal scrollytelling web page that:
 - How a modern web framework (Next.js + React) is organised.
 - How to deploy a static site to GitHub Pages for free.
 - **How to direct an AI pair on a real project across many sessions — using files, not chat, to hold meaning.** This is the transferable skill.
+
+By the end of this project you will have shipped a real, deployed, tested web application using the same planning-and-review discipline software teams use in production: spec-driven development, phased delivery, automated test coverage, and structured code review. The AI is how you scale your output. The discipline is how you stay employable when the AI does the easy 80%.
 
 Keep going → [01-the-stack.md](01-the-stack.md).

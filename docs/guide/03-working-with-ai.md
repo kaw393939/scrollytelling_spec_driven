@@ -12,6 +12,17 @@ This is the most important file in the guide. The tech stack is something you wi
 
 > **TL;DR.** AI writes code cheaply; direction is scarce. Put your direction in files (references, specs, phases), not in chat. Verify with a command, not a vibe. Run the [control loop](#the-control-loop).
 
+## Pedigree — whose shoulders this stands on
+
+Nothing in this guide is new. The methodology is four old engineering disciplines re-applied to AI pairing:
+
+- **W. Edwards Deming** — *Plan-Do-Check-Act*, the quality-control loop from 1950s manufacturing. **Our control loop is PDCA with seven steps instead of four.** If you ever take an operations or quality class, you'll meet him again.
+- **Donald Knuth** — *The Art of Computer Programming.* Algorithmic correctness, invariants, termination proofs, and the warning against premature optimization. This is the **Knuth audit** lens.
+- **Robert C. Martin ("Uncle Bob")** — *Clean Code* and the SOLID principles (the "L" in SOLID is **Barbara Liskov**'s substitution principle). Names that tell the truth, small functions, separated responsibilities. This is the **Clean Code audit** lens.
+- **Gamma, Helm, Johnson, and Vlissides ("the Gang of Four")** — *Design Patterns: Elements of Reusable Object-Oriented Software.* The vocabulary for common solutions: strategy, factory, observer, adapter. This is the **GoF audit** lens.
+
+**What's new is applying these to AI pairing.** The AI is fast and fluent but has no judgment about correctness, structure, or patterns. You supply the judgment by running the same review passes a senior engineer would have done before AI existed. The process is older than your AI assistant; the AI just makes it more necessary, not less.
+
 ## Start from the physics
 
 Take a moment to notice what is actually happening when you open an AI coding assistant.
@@ -268,6 +279,24 @@ Symptoms and fixes you will actually use:
 | Phase drifts from what the spec said | Skipped pre-flight QA | Re-run step 5 of the control loop against the current codebase before resuming |
 | Yesterday's feature stopped working after today's change | No regression test | Add a test that fails now, then fix. Do not proceed without it |
 | AI refactor "succeeded" but something subtle is off | No test on the refactored boundary | Write the golden-path e2e first; refactor under it |
+
+## Self-assessment — am I actually doing this?
+
+The process is easy to perform badly. One honest question per loop step — answer yes or you haven't really done it.
+
+| Step | The honest question |
+|---|---|
+| **1. Harvest** | Did I list at least one idea I would not have thought of on my own? |
+| **2. Converge** | Can I defend the chosen scope in a single paragraph without saying "also"? |
+| **3. Specify** | Could I delete half my spec and still know what I'm building? (If no, it's too big.) |
+| **4. Phase** | Does every phase objective map to a command I can run? |
+| **5. Pre-flight QA** | Did I find something in the codebase the plan didn't know about? |
+| **6. Implement** | Did I stop at the edges of the phase instead of following an interesting tangent? |
+| **6a. Tests** | Did I write the failing test *before* the code that fixes it, at least once? |
+| **7. Exit QA** | Did I resist calling it done before every check passed — including the ones I almost skipped? |
+| **7.5. Audit** | Did each finding get a disposition, including "wontfix" with a reason? |
+
+If you answer no to several of these on the same phase, the fix is not a better prompt. The fix is to slow down at the step you're skipping.
 
 ## Keep reading
 

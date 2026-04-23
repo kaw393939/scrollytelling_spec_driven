@@ -63,6 +63,17 @@ A good submission demonstrates, at minimum:
 | **Images used intentionally** | At least one image you added yourself, referenced correctly, visible on the page *and* listed on `/images/`. |
 | **Clean commit history** | Commits have real messages. No `wip`, `asdf`, or `final-FINAL-v2`. |
 | **README updated** | Your README has your live site URL and your name. See "How to submit" below. |
+| **`PROCESS.md` submitted** | A short file in your fork that shows *how* you worked, not just what you shipped. See below. |
+
+## `PROCESS.md` — grading the payload, not just the vehicle
+
+Anyone can ship a deployed page. The point of this assignment is to practise directing an AI pair on something bigger than a chat window. So alongside your site, commit a file at the top of your fork called **`PROCESS.md`** containing three sections:
+
+1. **One feature, the prompts you used.** Pick one feature you built with AI help. Paste the actual prompts (or a faithful summary if the chat was long), in the order you sent them. No editing for flattery. If the first three prompts were bad, show them.
+2. **Exit checks — pass and fail.** For that same feature, list the exit checks you defined up front and mark each as pass or fail. If any failed, say what you did about it.
+3. **Failure-mode reflection.** From [03-working-with-ai.md](03-working-with-ai.md), the four failure modes are: *short memory, invents when unsure, does more than you asked, cannot tell you it is lost.* Which one did you actually hit during this project? Describe the moment in one paragraph. What did you change?
+
+Length target: one page. There is no rubric for "good process" — writing it down honestly is the grade. A `PROCESS.md` that admits to mistakes is worth more than one that pretends everything was smooth.
 
 Stretch goals:
 
