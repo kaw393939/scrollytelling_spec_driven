@@ -107,6 +107,26 @@ This is the artefact the guide has been missing. A student reading it should be 
 
 > *(paste the sequence — don't clean it up)*
 
+**Trajectory table**
+
+Record the shape of the session as it happened. One row per prompt. Use the labels
+`read`, `locate`, `reproduce`, `explain`, `edit`, `verify`, `thrash`, `loopback`.
+A healthy run is mostly read/locate/reproduce/explain/edit/verify. Any `thrash` row is
+an honest signal — leave it in.
+
+| # | Human prompt | Agent behavior | Shape | Evidence | Loopback? |
+|---|---|---|---|---|---|
+| 1 | | | read | | |
+| 2 | | | locate | | |
+| 3 | | | reproduce | | |
+| 4 | | | explain | | |
+| 5 | | | edit | | |
+| 6 | | | verify | | |
+
+Add more rows as the session goes on. If you see a `thrash` row, the next row should
+be a `loopback` — back to pre-flight QA, tests, or spec revision. If it is not, that
+is the moment the session went off the rails.
+
 **Tests written:**
 
 | Level | What it covers | Pass/fail on first run |
@@ -156,6 +176,21 @@ npm run test:e2e
 - `[file:line] — observation — disposition (blocker | backlog | wontfix)`
 
 **Blockers resolved before closing the phase:** *(list)*
+
+---
+
+### Review burden report
+
+Filled in at the end of the phase, before the retrospective. Short on purpose — if
+this grows past ten lines, the phase was too big.
+
+- **Files changed:**
+- **LOC added / removed:**
+- **Tests added:**
+- **Commands run:** `npm run lint` / `npm run test` / `npm run build` / `npm run test:e2e`
+- **What changed from the plan:**
+- **What I deliberately did not change:**
+- **What a human reviewer should inspect first:**
 
 ---
 

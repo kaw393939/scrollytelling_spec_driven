@@ -67,7 +67,16 @@ This repo uses a three-layer process to keep a human and an AI coding assistant 
 
 The idea in one paragraph: a modern AI coding assistant is a nearly unlimited supply of raw intelligence. What is scarce is **direction**. Specs give the AI stable meaning; phases give it a scoped task; references give it real code to port from; runnable exit checks and automated tests decide when the work is actually done. Correctness is a matter of commands, not vibes.
 
-Long-form treatment of the methodology, including the garden-hose mental model, failure modes, testing matrix, and audit lenses, lives in [docs/guide/03-working-with-ai.md](docs/guide/03-working-with-ai.md).
+### Why we work this way (the research in four numbers)
+
+This is not folklore. Large-scale studies of real coding-agent runs converge on four findings that shape every habit in this repo:
+
+- **The ceiling is architectural judgment, not editing skill.** On 12 SWE-bench tasks that *no* agent solves, agents find the correct file 12/12 times and edit it 10/12 times — then fix the symptom instead of the root cause. [4]
+- **Trajectory *shape* predicts success; length does not.** Once task difficulty is controlled, longer runs are not worse runs. What separates wins from losses is the ratio of read → edit → verify. Premature patching in the opening steps is the single strongest negative signal (ρ = −0.78). [4]
+- **Reviewer abandonment is the #1 reason agent PRs fail in the wild** (38% of rejections across 33,596 PRs), followed by duplicate PRs (23%) and CI/test failures (17%). Big diffs don't get read. [2]
+- **The model matters more than the scaffold.** Agents with the same LLM agree on 85–93% of tasks across frameworks; agents sharing a framework but with different LLMs agree on only 47–88%. Verbose prompts don't rescue weaker models at the frontier. [3][4]
+
+Translation for this course: diagnose before editing, keep diffs reviewable, test as you go, and put your effort into spec quality rather than prompt verbosity. Long-form treatment — garden-hose model, failure modes, testing matrix, audit lenses, and full citations — lives in [docs/guide/03-working-with-ai.md](docs/guide/03-working-with-ai.md).
 
 ## The control loop (at a glance)
 

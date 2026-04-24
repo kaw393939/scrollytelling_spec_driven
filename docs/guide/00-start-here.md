@@ -15,6 +15,17 @@ This guide is about the habits that don't break.
 
 The Next.js stack is the *vehicle*. The process is the *payload*. Frameworks will change; how you direct an AI pair on a codebase larger than a chat window will not. Do the brief honestly and the process will stick.
 
+## Why these habits (what the research actually shows)
+
+The process in this guide is not taste. It's a response to four findings that keep showing up in large-scale empirical studies of AI coding agents in 2025–2026:
+
+- **Agents find the right file and still ship the wrong fix.** On a set of SWE-bench tasks that no frontier agent solves, the agent correctly locates the bug in nearly every case and then patches the wrong architectural layer. The ceiling is *judgment*, not editing skill.
+- **Session *shape* beats session *length*.** Successful runs read, reproduce, edit once, then validate. Failed runs tend to edit before they've read — and once a session enters that mode, more steps don't rescue it.
+- **Unreviewable PRs don't merge.** In a study of 33,596 agent-authored pull requests, the #1 cause of rejection (38%) was reviewers simply abandoning the PR — not incorrect code. Size and noise kill more changes than bugs do.
+- **The model matters more than the scaffold.** Verbose prompts and elaborate frameworks don't rescue weaker models, and they don't add much to stronger ones. What carries is a tight spec and a real test.
+
+Everything in Part 2 — the control loop, the spec/phase split, the exit checks, the audits — is aimed at these four failure modes. If you skip to the methodology later, you'll recognise each habit as a direct response to one of them. Full citations live in [03-working-with-ai.md](03-working-with-ai.md).
+
 ## Reading order
 
 The guide is in three parts. **Do Part 1 first**, ship something, then come back for Part 2. Methodology makes more sense after you have felt the work.

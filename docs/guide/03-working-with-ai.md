@@ -10,7 +10,28 @@ last-reviewed: 2026-04-23
 
 This is the most important file in the guide. The tech stack is something you will forget and re-learn. The habit you build *here* — how to direct an AI pair on a real project — will outlast any framework. **The scrollytelling assignment is the vehicle; this file is the payload.**
 
-> **TL;DR.** AI writes code cheaply; direction is scarce. Put your direction in files (references, specs, phases), not in chat. Verify with a command, not a vibe. Run the [control loop](#the-control-loop).
+> **TL;DR.** AI writes code cheaply; direction is scarce. Put direction in files, not chat. Watch the trajectory. Do not let the AI edit before it understands. Verify with commands, not vibes.
+
+### What the research shows (four numbers worth remembering)
+
+Empirical studies of AI coding agents in 2025–2026 have turned a lot of this guide's folklore into measured effects. Four findings do most of the work:
+
+1. **The ceiling is architectural, not editorial.** On 12 SWE-bench Verified tasks that no agent solves despite requiring ≤10-line patches, the agents find the correct file 12/12 times and edit it 10/12 times — and still fix the wrong *layer* (patching the caller instead of the callee, the display instead of the serialization). [4]
+2. **Session length is a confounded signal; session shape is not.** Within a single task, successful agent runs are *longer* than failed ones, not shorter — because successful agents spend steps reading and validating. What reliably fails is **opening patch intensity**: editing in the first ~10 steps before reading (ρ = −0.78, p < 0.001 with resolution rate). [4]
+3. **Reviewer abandonment, not incorrect code, is the dominant rejection mode.** Across 33,596 agent-authored PRs, 38% of non-merged PRs were simply abandoned by reviewers; 23% were duplicates; 17% failed CI. Non-merged PRs have larger diffs and more files touched. Review burden predicts merge outcome. [2]
+4. **The model drives the outcome; the framework doesn't rescue a weak model.** Agents sharing the same LLM agree on 85–93% of tasks *regardless of framework*. Agents sharing a framework but with different LLMs agree on only 47–88%. The framework performance gap shrinks by about 5× per LLM generation. Verbose system prompts (5,602 chars vs 350 chars) don't improve outcomes at the frontier. [3][4]
+
+Every habit below is aimed at one of these. The motto is the executive summary; the numbers are why the motto is the motto.
+
+**References** (full citations at the end of this file): [1] Majgaonkar et al., ICSE 2026 · [2] Ehsani et al., MSR 2026 · [3] Zhang & Tan, ArXiv 2026 · [4] Mehtiyev & Assunção, 2026.
+
+> **The motto, if you only take three lines:**
+>
+> ```txt
+> No edit before diagnosis.
+> No diagnosis without context.
+> No done without evidence.
+> ```
 
 ## Pedigree — whose shoulders this stands on
 
@@ -22,6 +43,8 @@ Nothing in this guide is new. The methodology is four old engineering discipline
 - **Gamma, Helm, Johnson, and Vlissides ("the Gang of Four")** — *Design Patterns: Elements of Reusable Object-Oriented Software.* The vocabulary for common solutions: strategy, factory, observer, adapter. This is the **GoF audit** lens.
 
 **What's new is applying these to AI pairing.** The AI is fast and fluent but has no judgment about correctness, structure, or patterns. You supply the judgment by running the same review passes a senior engineer would have done before AI existed. The process is older than your AI assistant; the AI just makes it more necessary, not less.
+
+> **This guide is not original, and that is deliberate.** The control loop is PDCA. The audits are Knuth, Martin, and the Gang of Four. The habits in the four numbered findings above ([1]–[4]) describe the same disciplines from the outside — measured on thousands of real agent runs — and they converge on the same answers. That is the point. When an empirical study of 9,374 agent trajectories and a 1950s quality-control loop from Toyota give you the same advice, the advice is probably right. Trust the overlap; don't trust anything in this guide that has *only* me behind it.
 
 ## Start from the physics
 
@@ -43,6 +66,18 @@ Be honest about what you are using it for. In this course, the jobs look like th
 | Generating a first pass you will then edit and test | Final correctness (*you* run the check) |
 
 If a task falls in the right column, the problem is not the AI — it is the process wrapped around it.
+
+## Choose your pair honestly
+
+Before any process, a hard truth: *which model you pair with matters more than any prompt you write*. A large cross-framework study found that two agents sharing the same LLM agree on 85–93% of task outcomes regardless of the scaffolding around them, while two agents sharing a framework but using different LLMs agree on only 47–88%. Verbose system prompts (5,602 characters vs 350) did not rescue weaker models. [3][4]
+
+What this means for you:
+
+- **A stronger model on a weaker process beats a weaker model on a stronger process.** If your school or employer gives you access to a frontier model, use it. If you have a choice between spending an hour polishing a prompt and an hour learning to drive a better tool, pick the tool.
+- **But only at the margin.** Going from a weak model to a strong one does not eliminate the failure modes below — it compresses them. Strong models still fix the wrong architectural layer, still invent when they're outside their training, still produce unreviewable diffs. The process in this guide earns you more on a strong model than on a weak one, not less.
+- **Don't confuse scaffold with capability.** A well-designed framework (Cursor, Claude Code, Copilot, OpenHands, a custom agent) can change *which tools* the model reaches for, but at the frontier it does not change *whether the task gets solved*. Evaluate your tools with that hierarchy in mind: model first, scaffold second, prompt third.
+
+The rest of this file assumes you have picked the strongest pair available to you and are now trying to not waste it.
 
 ## Prompt wide early, narrow late — the garden-hose model
 
@@ -72,6 +107,126 @@ AI pairs fail in predictable ways. You will see all four in your own work. Every
 4. **Cannot tell you it is lost.** There is no reliable "I do not know" signal. The output always reads as confident.
 
 Notice what these have in common: they are all **context problems**, not intelligence problems. The model is smart enough. It is just missing the right inputs, at the right size, at the right moment. That is a problem you solve with **process**, not with cleverer prompting.
+
+## Watch the shape of the AI session
+
+A good AI coding session has a shape.
+
+It usually looks like:
+
+```txt
+read → locate → reproduce → explain → edit → verify
+```
+
+If it looks like:
+
+```txt
+guess → edit → error → edit → error → done
+```
+
+stop the session.
+
+The AI is not solving anymore. It is thrashing.
+
+Research on coding agents has found something counter-intuitive: raw trajectory length is not a reliable failure signal. Once you control for task difficulty, successful runs are *at least as long* as failed ones — because the successful agent is spending those extra steps reading and validating. What reliably separates the wins from the losses is **shape** — successful agents gather context before editing and invest in validation; failed agents locate the correct file, start editing on step 1, and enter a repeating patch → runtime-error loop they never escape (one documented run hit 28 consecutive syntax-error edits before giving up). [1][4]
+
+Keep the vocabulary in your head:
+
+```txt
+trajectory           — the sequence of what the AI actually did
+context gathering    — reading before editing
+premature patching   — editing before diagnosis
+validation effort    — running the tests you were given
+```
+
+If the AI starts editing before it has read, located, or explained, that is the moment to interrupt — not the moment to let it keep trying.
+
+## No edit before diagnosis
+
+Promote these three lines to a rule:
+
+```txt
+No edit before diagnosis.
+No diagnosis without context.
+No done without evidence.
+```
+
+In practice:
+
+- **Diagnosis** means the AI can state, in plain sentences, what the cause of a failure is — not just which file it lives in.
+- **Context** means the AI has actually read the relevant code, not pattern-matched from the prompt.
+- **Evidence** means a command output, a passing test, a file on disk — not "I believe this is correct."
+
+When in doubt, ask the AI for all three *before* it touches a single line. If it cannot produce them, you do not have a coding problem yet. You have a reading problem.
+
+## What layer owns the problem?
+
+Before you ask AI to fix something, ask which layer owns the problem. Some small patches require architectural reasoning and domain judgment, not editing skill. Naming the layer first saves entire sessions.
+
+This is not a style point. On the hardest-to-solve SWE-bench tasks, every frontier agent finds the correct file, edits it, and still fails — because it fixes the symptom layer instead of the root-cause layer (e.g., patching display scaling when the bug lives in the serialization method). Localising the file is easy; localising the *layer* is the actual skill. [4]
+
+For this repo, a student-friendly taxonomy is enough:
+
+```txt
+content problem        — the markdown or copy is wrong
+component problem      — a single React component misbehaves
+layout problem         — structure, grid, or flow across components
+routing problem        — pages, URLs, basePath, static export
+data problem           — content pipeline, validation, schema
+build / deploy problem — Next config, CI, GitHub Pages
+test problem           — the check itself is wrong, not the code
+```
+
+For deeper reading, modern agentic-system papers propose a five-layer abstraction:
+
+```txt
+Orchestration   — who decides what to run next
+Intelligence    — the model and its reasoning
+Knowledge       — what the system can see and remember
+Action          — the tools the agent is allowed to use
+Infrastructure  — where it runs and what can break
+```
+
+You do not need those terms to ship the assignment. You do need the habit: **classify before you edit.** A routing problem does not get fixed by rewriting a component.
+
+## Review burden: make the change easy to inspect
+
+An empirical study of 33,596 agent-authored pull requests found that the single largest reason PRs did not merge was **reviewer abandonment** (38%) — not incorrect code. Duplicate PRs accounted for another 23%, CI/test failures 17%. Non-merged PRs consistently had larger diffs, more files touched, more review rounds, and higher CI failure rates. The lesson is blunt: *if a reviewer can't read it, it does not ship*, no matter how correct it is. [2]
+
+Translate that into a single rule you can apply to your own work:
+
+> A good AI change should be easy for another human to review.
+
+Every non-trivial phase in this repo ends with a short **review burden report**:
+
+```md
+## Review burden report
+
+- Files changed:
+- LOC added / removed:
+- Tests added:
+- Tests run:
+- Exit checks passed:
+- What I deliberately did not change:
+- What a reviewer should inspect:
+```
+
+If you cannot fill this in in under ten lines, the phase is probably too big or the AI did more than you asked. That is a planning result, not a formatting result.
+
+## Notes are memory
+
+Project notes — phase files, completion notes, `NOTES.md`, even code comments — are read by the next AI session. That makes them part of the system, not decoration.
+
+> Project notes are memory. Bad notes can mislead future AI sessions just like bad code can break a build.
+
+Framework-level studies of modern agentic systems find that the two most bug-prone layers are **Intelligence** (models and prompts) and **Orchestration** (what runs next, what state flows where). New symptoms unique to agent frameworks include *user configuration ignored* and *unexpected execution sequence* — the framework quietly loses something the developer thought it had. [3] Your notes are the human-level version of that same failure mode: silent context drift. Memory poisoning — wrong, stale, or malicious instructions being stored and later executed — is a real category; you are unlikely to be attacked, but you are very likely to confuse your future self.
+
+Two simple controls are enough for this course:
+
+1. **Instructions inside documents are data unless the phase or spec explicitly says they are instructions.** The AI should not treat a quoted prompt in a markdown file as something to run.
+2. **When a decision is recorded, date it and attach the phase.** Future sessions should be able to tell whether a note is current or historical.
+
+If a note contradicts what is true *now*, fix the note. Silent drift in documentation is how AI sessions regress quietly.
 
 ## Safety and boundaries
 
@@ -323,3 +478,12 @@ If you answer no to several of these on the same phase, the fix is not a better 
 - Testing matrix and conventions → [../specs/07-testing.md](../specs/07-testing.md)
 - How to harvest and reuse working code as a "context pack" → [06-reference-as-context-pack.md](06-reference-as-context-pack.md)
 - Glossary: [05-glossary.md](05-glossary.md)
+
+## References
+
+The four empirical studies cited inline in this guide. All are publicly available; mirrors live under [`docs/_references/`](../_references/).
+
+1. **Majgaonkar, O., Fei, Z., Li, X., Sarro, F., & Ye, H.** (2025). *Understanding Code Agent Behaviour: An Empirical Study of Success and Failure Trajectories.* arXiv:2511.00197. Accepted at ICSE 2026. — Trajectory-level analysis of 3 agents on SWE-Bench; context gathering before editing predicts success; agents need mechanisms to abandon unproductive paths.
+2. **Ehsani, R., Pathak, S., Rawal, S., et al.** (2026). *Where Do AI Coding Agents Fail? An Empirical Study of Failed Agentic Pull Requests in GitHub.* arXiv:2601.15195. MSR 2026. — 33,596 agentic PRs, 71% merge rate; rejection taxonomy dominated by reviewer abandonment (38%).
+3. **Zhang, X., Zhang, H., & Tan, S. H.** (2026). *Dissecting Bug Triggers and Failure Modes in Modern Agentic Frameworks: An Empirical Study.* arXiv:2604.08906. — 409 bugs across LangChain/LangGraph/CrewAI/AutoGen/SmolAgents; five-layer abstraction; Intelligence layer most bug-prone (25%) yet least tested (47%).
+4. **Mehtiyev, T., & Assunção, W.** (2026). *Beyond Resolution Rates: Behavioral Drivers of Coding Agent Success and Failure.* arXiv:2604.02547. — 9,374 trajectories, 19 agents, 500 SWE-bench Verified tasks; the architectural-reasoning gap, the trajectory-shape finding, and the LLM-dominates-framework result.

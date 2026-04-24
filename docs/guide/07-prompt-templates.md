@@ -102,6 +102,69 @@ Optional but recommended after any phase with non-trivial logic or new abstracti
 
 ---
 
+## Supervision prompts (use anytime)
+
+These are not tied to one loop step. Use them whenever you need to slow the AI down, classify a task, stop a thrash, or close out a change cleanly.
+
+### Trajectory check
+
+> Before editing, inspect the current codebase and report the likely session shape:
+> - What files did you read?
+> - What did you locate?
+> - Can you reproduce or simulate the issue?
+> - What do you believe the cause is?
+> - What is the smallest safe edit?
+>
+> Do not edit yet.
+
+**Mode:** narrow. You are enforcing *read → locate → reproduce → explain* before any edit.
+
+### Architecture-layer check
+
+> Classify this task before implementation:
+> - content
+> - component
+> - layout
+> - route
+> - data
+> - build / deploy
+> - test
+>
+> Then explain why the fix belongs there. If more than one layer is involved, name the primary one and list the others as touched.
+
+**Mode:** narrow. Naming the layer prevents the AI from editing in the wrong place.
+
+### Thrash detector
+
+> The last attempt failed. Do not keep editing blindly.
+>
+> Summarize:
+> - what changed
+> - what failed
+> - what evidence we have (commands run, outputs, test results)
+> - whether to loop back to pre-flight QA, tests, implementation, or spec revision
+>
+> Do not edit again until we agree on the loopback target.
+
+**Mode:** narrow. This is the verbal equivalent of taking the keyboard back.
+
+### Review burden report
+
+> After implementation, report:
+> - files changed
+> - LOC added / removed
+> - tests added
+> - commands run (lint / test / build / e2e)
+> - what changed from the plan
+> - what was deliberately not changed
+> - what a human reviewer should inspect first
+>
+> Keep it under ten lines. If you cannot, explain why this phase is larger than expected.
+
+**Mode:** narrow. Append the output to the phase file under `## Review burden report`.
+
+---
+
 ## If step 7 (or 7.5) fails
 
 You do not move on. You loop back:
